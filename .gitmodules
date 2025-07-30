@@ -1,0 +1,9 @@
+[submodule "core-ui-react"]
+	path = core-ui-react
+	url = https://github.com/hamedabdy/core-ui-react.git
+[submodule "core-server"]
+	path = core-server
+	url = https://github.com/hamedabdy/node-project2.git
+[submodule "selfimprove-app"]
+	path = selfimprove-app
+	url = https://github.com/hamedabdy/selfimprove-app.git
