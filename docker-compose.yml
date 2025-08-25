@@ -71,10 +71,9 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./core-db/my.cnf:/etc/mysql/my.cnf   # Mount custom my.cnf
-      # - ./core-db:/docker-entrypoint-initdb.d
+      - ./core-db/db-backups/backup20250609.sql:/docker-entrypoint-initdb.d/30-backup20250609.sql
       - ./core-db/init.sql.template:/docker-entrypoint-initdb.d/init.sql.template  # Mount the SQL template
       - ./core-db/init.sql-subst.sh:/docker-entrypoint-initdb.d/init.sql-subst.sh  # Mount the shell script
-    # entrypoint: ["sh", "-c", "/docker-entrypoint-initdb.d/init.sql-subst.sh && docker-entrypoint.sh mysqld"]  # Run the shell script before the main entrypoint
     env_file:
       - ./core-db/.env
     healthcheck:

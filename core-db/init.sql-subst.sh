@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 TEMPLATE="/docker-entrypoint-initdb.d/init.sql.template"
 OUTPUT="/tmp/20-init.sql"
+BACKUP_FILE="/docker-entrypoint-initdb.d/30-backup20250609.sql"
 
 # Use MariaDB official env names to align with image behavior
 : "${MYSQL_ROOT_PASSWORD:?ERROR: MYSQL_ROOT_PASSWORD is required}"
@@ -11,6 +12,7 @@ OUTPUT="/tmp/20-init.sql"
 : "${MYSQL_PASSWORD:?ERROR: MYSQL_PASSWORD is required}"
 
 # Only generate SQL if template exists
+# CREATE the OUTPUT file in /tmp
 if [ -f "$TEMPLATE" ]; then
   envsubst < "$TEMPLATE" > "$OUTPUT"
   chmod 600 "$OUTPUT"
@@ -31,7 +33,8 @@ else
     echo "Applying idempotent init SQL post-init..."
     mariadb --protocol=socket --socket=/var/run/mariadb/mariadb.sock \
       -uroot -p"$MYSQL_ROOT_PASSWORD" \
-      ${MYSQL_DATABASE:+ "$MYSQL_DATABASE"} < "$OUTPUT"
+      ${MYSQL_DATABASE:+ "$MYSQL_DATABASE"} < "$OUTPUT" \
+      ${MYSQL_DATABASE:+ "$MYSQL_DATABASE"} < "$BACKUP_FILE"
   fi
 fi
 
