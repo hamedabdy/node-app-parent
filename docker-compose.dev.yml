@@ -1,0 +1,49 @@
+# version: '3.8'
+
+services:
+  # Core API Server
+  core-server:
+    build:
+      context: ./core-server
+      dockerfile: Dockerfile
+      target: development  # Specify the development stage
+    volumes:
+      - ./core-server/src:/app/src
+      - ./core-server/package.json:/app/package.json  # Mount package.json
+      - ./core-server/package-lock.json:/app/package-lock.json  # Mount package-lock.json
+      - ./core-server/nodemon.json:/app/nodemon.json  # Ensure nodemon settings are applied
+    env_file:
+      - ./core-server/.env # need to load .env.dev
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db       # Set DB_HOST directly in docker-compose
+
+  # AI & Scripting Service
+  selfimprove-app:
+    build:
+      context: ./selfimprove-app
+      dockerfile: Dockerfile
+      target: development  # Specify the development stage
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./selfimprove-app/src:/app/src
+      - ./core-server/package.json:/app/package.json  # Mount package.json
+      - ./core-server/package-lock.json:/app/package-lock.json  # Mount package-lock.json
+      - ./core-server/nodemon.json:/app/nodemon.json  # Ensure nodemon settings are applied
+    env_file:
+      - ./selfimprove-app/.env # need to load .env.dev
+
+  # React Frontend
+  core-ui-react:
+    build:
+      context: ./core-ui-react
+      dockerfile: Dockerfile
+      target: development  # Specify the development stage
+    volumes:
+      - ./core-ui-react/src:/app/src
+      - ./core-ui-react/public:/app/public
+      - ./core-ui-react/package.json:/app/package.json
+      - ./core-ui-react/package-lock.json:/app/package-lock.json
+    env_file:
+      - ./core-ui-react/.env # need to load .env.dev

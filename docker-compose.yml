@@ -8,18 +8,23 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./core-server/src:/app/src
     env_file:
       - ./core-server/.env
     environment:
+      - NODE_ENV=production
       - DB_HOST=db       # Set DB_HOST directly in docker-compose
     depends_on:
       # - db
       db:
-          condition: service_healthy
-          restart: true
+        condition: service_healthy
+        restart: true
       # - redis
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet \"http://$$HOST:$$PORT/ping\" || exit 1"] #curl --fail -s -o /dev/null http://$HOST:$PORT/api/table/test_connection || exit 1
+      interval: 25s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
     restart: unless-stopped
 
   # AI & Scripting Service
@@ -28,9 +33,7 @@ services:
       context: ./selfimprove-app
       dockerfile: Dockerfile
     ports:
-      - "3002:3002"
-    volumes:
-      - ./selfimprove-app/src:/app/src
+      - "3002:3000" # Map to 3000 inside the container
     env_file:
       - ./selfimprove-app/.env
       # - redis
@@ -42,10 +45,7 @@ services:
       context: ./core-ui-react
       dockerfile: Dockerfile
     ports:
-      - "3001:3001"
-    volumes:
-      - ./core-ui-react:/app
-      - /app/node_modules  # Ensure node_modules is in the container and not overwritten
+      - "3001:3000" # Map to 3000 inside the container
     env_file:
       - ./core-ui-react/.env
     stdin_open: true
@@ -54,38 +54,33 @@ services:
       core-server: 
         condition: service_healthy
         restart: true
+    healthcheck:
+      test: curl --fail -s -o /dev/null http://localhost:3000 || exit 1
+      interval: 10s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
     restart: unless-stopped
 
   # Database
   db:
-    image: mariadb:lts-ubi9  # Ubuntu-based (stable), or use alpine if available
+    image: mariadb:lts-ubi9
     # command: --sql_mode=""
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - type: bind
-        source: ./core-db/my.cnf
-        target: /etc/mysql/my.cnf
-      # - ./core-db/my.cnf:/etc/mysql/my.cnf   # Mount custom my.cnf
-      - type: bind
-        source: ./core-db
-        target: /docker-entrypoint-initdb.d
-      - type: bind
-        source: ./core-db/init.sql.template
-        target: /docker-entrypoint-initdb.d/init.sql.template  # Mount the SQL template
-      # - ./core-db/init.sql.template:/docker-entrypoint-initdb.d/init.sql.template  # Mount the SQL template
-      - type: bind
-        source: ./core-db/init.sql-subst.sh
-        target: /docker-entrypoint-initdb.d/init.sql-subst.sh  # Mount the
-      # - ./core-db/init.sql-subst.sh:/docker-entrypoint-initdb.d/init.sql-subst.sh  # Mount the shell script
-    # entrypoint: ["sh", "-c", "ls -al / && ls -al /docker-entrypoint-initdb.d/ && /docker-entrypoint-initdb.d/init.sql-subst.sh && docker-entrypoint.sh mysqld"]  # Run the shell script before the main entrypoint
+      - ./core-db/my.cnf:/etc/mysql/my.cnf   # Mount custom my.cnf
+      # - ./core-db:/docker-entrypoint-initdb.d
+      - ./core-db/init.sql.template:/docker-entrypoint-initdb.d/init.sql.template  # Mount the SQL template
+      - ./core-db/init.sql-subst.sh:/docker-entrypoint-initdb.d/init.sql-subst.sh  # Mount the shell script
+    # entrypoint: ["sh", "-c", "/docker-entrypoint-initdb.d/init.sql-subst.sh && docker-entrypoint.sh mysqld"]  # Run the shell script before the main entrypoint
     env_file:
       - ./core-db/.env
     healthcheck:
-      test: mysql -h localhost -u root -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1;'
+      test: ["CMD-SHELL", "mariadb-admin --socket=/var/run/mariadb/mariadb.sock -uroot -p\"$$MYSQL_ROOT_PASSWORD\" ping --silent"]
       interval: 10s
-      retries: 5
+      retries: 3
       start_period: 30s
       timeout: 10s
     restart: unless-stopped
