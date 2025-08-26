@@ -12,6 +12,7 @@ services:
       - ./core-server/package.json:/app/package.json  # Mount package.json
       - ./core-server/package-lock.json:/app/package-lock.json  # Mount package-lock.json
       - ./core-server/nodemon.json:/app/nodemon.json  # Ensure nodemon settings are applied
+      - ./core-server/.env:/app/.env
     env_file:
       - ./core-server/.env # need to load .env.dev
     environment:
@@ -24,15 +25,16 @@ services:
       context: ./selfimprove-app
       dockerfile: Dockerfile
       target: development  # Specify the development stage
-    environment:
-      - NODE_ENV=development
     volumes:
       - ./selfimprove-app/src:/app/src
       - ./core-server/package.json:/app/package.json  # Mount package.json
       - ./core-server/package-lock.json:/app/package-lock.json  # Mount package-lock.json
       - ./core-server/nodemon.json:/app/nodemon.json  # Ensure nodemon settings are applied
+      - ./core-server/.env:/app/.env
     env_file:
       - ./selfimprove-app/.env # need to load .env.dev
+    environment:
+      - NODE_ENV=development
 
   # React Frontend
   core-ui-react:
@@ -45,5 +47,8 @@ services:
       - ./core-ui-react/public:/app/public
       - ./core-ui-react/package.json:/app/package.json
       - ./core-ui-react/package-lock.json:/app/package-lock.json
+      - ./core-ui-react/.env:/app/.env # Mount .env file for development
     env_file:
       - ./core-ui-react/.env # need to load .env.dev
+    environment:
+      - REACT_APP_ENV=development
