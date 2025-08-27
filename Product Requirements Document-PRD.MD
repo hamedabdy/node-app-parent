@@ -19,7 +19,13 @@ This SaaS platform enables companies and enterprises to organize and manage thei
 - Establish a manageable architecture where the backoffice supports administrative and configuration tasks, while the frontend portal provides simplified access for regular end users.  
 - Provide users the ability to create reports on any accessible table and build dashboards with multiple reports as widgets, organized into tabs.  
 - Ensure performance and security by limiting the number of reports loaded consecutively on dashboard load, configurable by admins.  
-- Support sharing of reports and dashboards with users, roles, and groups for collaboration.
+- Support sharing of reports and dashboards with users, roles, and groups for collaboration.  
+- Facilitate comprehensive CRUD operations on data and schema objects including tables, inherited tables, and fields.  
+- Support data export in multiple formats (XML, JSON, PDF, CSV, Excel) for data lists, forms, reports, and dashboards in addition to image exports (JPEG, PNG).  
+- Provide intuitive navigation across tables and records respecting user privileges, enhanced by a navigation pane for easier access.  
+- Enable admins to access system and REST API logs for monitoring and troubleshooting.  
+- Support user-driven and system-triggered email notifications, including custom emails from within the platform.  
+- Enable in-system user notifications and real-time chat capabilities.
 
 ---
 
@@ -48,7 +54,16 @@ This SaaS platform enables companies and enterprises to organize and manage thei
 - As a **data importer user**, I want the system to notify me of any import errors or warnings with clear, actionable messages, so I can fix issues efficiently.  
 - As a **user**, I want to create reports on any table I have access to and build dashboards composed of one or more report widgets organized in multiple tabs, so I can visualize and analyze data effectively.  
 - As a **system admin**, I want to configure limits on the number of reports loaded consecutively on dashboard load to preserve performance and ensure security.  
-- As a **user**, I want to share reports and dashboards with other users, roles, and groups to enable collaboration and information sharing.
+- As a **user**, I want to share reports and dashboards with other users, roles, and groups to enable collaboration and information sharing.  
+- As a **user**, I want to perform CRUD operations across the platform, including creating tables, inherited tables, and fields, and modifying form and list layouts to tailor data entry and viewing.  
+- As a **user**, I want to export list data or single record data to XML, JSON, PDF, CSV, and Excel formats for offline use and reporting.  
+- As a **user**, I want to export reports and dashboards to the same data formats as well as JPEG and PNG for presentation and sharing.  
+- As a **user**, I want to navigate intuitively through different tables and records based on my access rights and privileges, aided by a navigation pane for quick access.  
+- As an **admin**, I want to consult system and REST API logs to monitor platform activity and troubleshoot issues.  
+- As a **user**, I want to compose and send customized emails directly from the platform.  
+- As a **system**, I want to send automatic emails triggered by events to keep users informed proactively.  
+- As a **user**, I want to receive notifications inside the platform to stay aware of important updates.  
+- As a **user**, I want to chat in real time with other users within the system to collaborate effectively.
 
 ---
 
@@ -68,6 +83,27 @@ This SaaS platform enables companies and enterprises to organize and manage thei
 - Allow users to build dashboards consisting of multiple tabs, where each tab can contain multiple report widgets.  
 - Limit the number of reports loaded consecutively upon dashboard load for security and performance. This limit is configurable by the admin via the sys_properties table.  
 - Enable sharing of reports and dashboards with other users, roles, and groups, respecting permissions.
+
+### CRUD & Navigation  
+- Enable users to perform full CRUD operations on data tables, including creating new tables, inherited tables, and fields dynamically through the UI.  
+- Allow users to modify form and list layouts for customized data entry and display.  
+- Support data export from lists and single records to XML, JSON, PDF, CSV, and Excel formats.  
+- Support export of reports and dashboards to the same data formats as above, plus JPEG and PNG image formats.  
+- Provide intuitive navigation across tables and records according to user access rights, enhanced by a navigation pane for quick access to platform features.
+
+### Table & Field Inheritance and Lifecycle Management  
+- When a new record is created in a parent table such as `sys_db_object` (which defines tables), the system automatically creates corresponding records in its parent table, `sys_metadata`, ensuring consistency across inherited metadata.  
+- New tables inherit all fields from their parent tables. For example, creating a new table record in `sys_db_object` triggers creation of a `collection` type record in `sys_dictionary` representing its fields.  
+- A matching record with the same `sys_id` is created in the `sys_metadata` parent table to maintain traceability and inheritance consistency across the platform metadata layer.  
+- Deletion of a table cascades accordingly: deleting the record in `sys_db_object` results in deletion of the corresponding record in `sys_metadata`, the associated collection record, and all linked fields in `sys_dictionary`.  
+- This cascading create/delete ensures referential integrity and synchronization between the platform’s metadata and actual database schema objects.
+
+### System Logs & Email Notifications  
+- Allow admins to consult system logs and REST API logs for platform monitoring and troubleshooting.  
+- Enable users to send custom emails from within the system interface.  
+- Support automatic event-based email notifications configured by admins with customizable templates.  
+- Provide in-platform notifications for real-time user alerts.  
+- Implement an in-system chat feature to enable user-to-user communication and collaboration.
 
 ### Platform Access & Roles  
 - Support user roles and ACLs assigned to CRUD/view operations at table and field levels with support for filter conditions.  
@@ -130,4 +166,3 @@ This SaaS platform enables companies and enterprises to organize and manage thei
 - Enhanced real-time dashboard updates and advanced analytics features.
 
 ---
-
