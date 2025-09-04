@@ -7,12 +7,12 @@ services:
       context: ./core-server
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:3000" # External_portal:internal_port. Map to 3000 inside the container
     env_file:
       - ./core-server/.env
     environment:
       - NODE_ENV=production
-      - DB_HOST=db       # Set DB_HOST directly in docker-compose
+      - DB_HOST=db # Set DB_HOST directly in docker-compose
     depends_on:
       # - db
       db:
@@ -33,7 +33,7 @@ services:
       context: ./selfimprove-app
       dockerfile: Dockerfile
     ports:
-      - "3002:3000" # Map to 3000 inside the container
+      - "3002:3000" # External_portal:internal_port. Map to 3000 inside the container
     env_file:
       - ./selfimprove-app/.env
       # - redis
@@ -45,7 +45,7 @@ services:
       context: ./core-ui-react
       dockerfile: Dockerfile
     ports:
-      - "3001:3000" # Map to 3000 inside the container
+      - "3001:3000" # External_portal:internal_port. Map to 3000 inside the container
     env_file:
       - ./core-ui-react/.env
     stdin_open: true
@@ -92,6 +92,19 @@ services:
   #   volumes:
   #     - redis_data:/data
   #   restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    build:
+      context: ./rproxy
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"  # Single entry point
+      - "443:443" # HTTPS
+    depends_on:
+      - core-server
+      - core-ui-react
+      - selfimprove-app
 
 volumes:
   db_data:
