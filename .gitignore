@@ -1,0 +1,6 @@
+notes.txt
+
+# .gitignore
+# .env
+
+core-db/db-backups/*
