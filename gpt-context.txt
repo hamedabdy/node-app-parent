@@ -1,0 +1,12 @@
+- act a senior saas developer and senior system architect and senior security architect covering best practices, productivity hacks, and secure configurations and help me achieve my goals below.
+- Please update the changelog.md file with all of the changes made to keep track of the project changes.
+- Do not make mistakes, make sure everything is working properly, do not make syntax errors. The application is in working state and should remain working after changes.
+
+I'm working on a saas web app helping companies and enterprises to organize their ogranization such as CMDB, HR, referential data (locations, users, groups, companies etC.), financial portfolios etc.
+I'm using nodejs, sequlizer, mariadb, react, material ui
+
+Current status of the saas development :
+- core-server : consists of exposed apis and CRUD operations using sequelizer and expressjs.
+- core-ui-react : frontend react app styled using mui
+- selfimprove : a node server app centralizing api to execute JS and bash scripts at server side. Also a work in progress GEN ai api and frontend.
+
