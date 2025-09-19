@@ -52,3 +52,8 @@ services:
       - ./core-ui-react/.env # need to load .env.dev
     environment:
       - REACT_APP_ENV=development
+      - CHOKIDAR_USEPOLLING=true  # Enable polling for file changes
+      - WATCHPACK_POLLING=true    # Enable polling for webpack
+      # WebSocket settings for hot reloading
+      - WDS_SOCKET_PORT=0
+      - WDS_SOCKET_HOST=localhost
